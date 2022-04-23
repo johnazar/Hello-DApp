@@ -10,7 +10,7 @@ contract HelloDApp {
         message = _msg;
     }
 
-    function readMesage() public view returns (string memory) {
+    function readMessage() public view returns (string memory) {
         return message;
     }
 

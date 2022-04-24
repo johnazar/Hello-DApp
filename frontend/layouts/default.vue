@@ -103,8 +103,13 @@ export default {
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'Hello DApp',
+          title: 'MetaMask',
           to: '/hellodapp'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Walletconnect',
+          to: '/walletconnect'
         }
       ],
       miniVariant: false,

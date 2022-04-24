@@ -49,18 +49,25 @@
             Current message: <v-icon @click="getMessage">mdi-refresh</v-icon>
           </v-list-item-title>
           <v-list-item-subtitle>{{ message }}</v-list-item-subtitle>
-          <v-list-item-title class="mb-1"> New message: </v-list-item-title>
-          <v-text-field v-model="newMessage" dense> </v-text-field>
+          <v-list-item-title class="mt-4 mb-1">
+            New message:
+          </v-list-item-title>
+          <v-form ref="form" v-model="formValid">
+            <v-text-field
+              v-model="newMessage"
+              :rules="messageRules"
+              clearable
+              dense
+            >
+            </v-text-field>
+          </v-form>
         </v-list-item-content>
       </v-list-item>
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          class="primary"
-          :disabled="!wallet_address"
-          @click="updateMessage"
-        >
+        <!-- <v-btn class="primary" @click="validate"> Validate</v-btn> -->
+        <v-btn class="primary" :disabled="!allowUpdate" @click="updateMessage">
           Update message</v-btn
         >
       </v-card-actions>
@@ -72,10 +79,20 @@
 export default {
   data: () => ({
     ethereumSupported: false,
+    formValid: false,
     message: '',
     newMessage: '',
+    messageRules: [
+      (v) => !!v || 'Message is required',
+      (v) => (v && v.length <= 25) || 'Message must be less than 10 characters',
+    ],
   }),
   computed: {
+    allowUpdate() {
+      // console.log(this.formValid)
+      // console.log(this.wallet_address)
+      return this.formValid && !!this.wallet_address
+    },
     wallet_addresses: {
       get() {
         return this.$store.getters['wallet/wallet_addresses']
@@ -166,8 +183,11 @@ export default {
         .send({
           from: this.wallet_address,
         })
-        .then(console.log())
+        .then((this.newMessage = ''))
         .catch(console.error())
+    },
+    validate() {
+      this.$refs.form.validate()
     },
   },
 }

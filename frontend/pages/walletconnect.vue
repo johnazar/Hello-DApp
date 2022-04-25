@@ -130,7 +130,12 @@ export default {
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
         this.connector = walletconnect
-        console.log(walletconnect)
+        const connector = new WalletConnect({
+          bridge: this.bridge,
+          qrcodeModal: QRCodeModal,
+        })
+        this.subscribeToEvents(connector)
+        // console.log(walletconnect)
       } else {
         console.log('not connected')
       }
@@ -141,23 +146,18 @@ export default {
         bridge: this.bridge,
         qrcodeModal: QRCodeModal,
       })
-      // this.connector = connector
       // check if already connected
       if (!connector.connected) {
         // create new session
         this.connector = await connector.createSession()
         this.subscribeToEvents(connector)
       }
-
-      // subscribe to events
-      // await this.subscribeToEvents(connector)
     },
     subscribeToEvents(connector) {
       connector.on('session_update', (error, payload) => {
         if (error) {
           throw error
         }
-
         // Get updated accounts and chainId
         const { accounts, chainId } = payload.params[0]
         this.chainId = chainId
@@ -204,6 +204,18 @@ export default {
     },
 
     getMessage() {
+      // Draft transaction
+      const tx = {
+        from: '0xbc28Ea04101F03aA7a94C1379bc3AB32E65e62d3', // Required
+        to: '0x89D24A7b4cCB1b6fAA2625Fe562bDd9A23260359', // Required (for non contract deployments)
+        data: '0x', // Required
+        gasPrice: '0x02540be400', // Optional
+        gas: '0x9c40', // Optional
+        value: '0x00', // Optional
+        nonce: '0x0114', // Optional
+      }
+
+      console.log('getMessage')
       this.$HelloDApp_contract.methods
         .readMessage()
         .call()

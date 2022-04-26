@@ -136,6 +136,10 @@ export default {
       // Check local storage
       if (window.localStorage.walletconnect) {
         const walletconnect = JSON.parse(localStorage.getItem('walletconnect'))
+        if (!walletconnect.connected) {
+          localStorage.removeItem('walletconnect')
+          return
+        }
         const { accounts } = walletconnect
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
@@ -147,10 +151,12 @@ export default {
         this.subscribeToEvents(connector)
         // console.log(walletconnect)
       } else {
+        this.connector = null
         console.log('not connected')
       }
     },
     async connect() {
+      // if (this.connector) return
       // create new connector
       const connector = new WalletConnect({
         bridge: this.bridge,
@@ -199,21 +205,21 @@ export default {
     },
 
     disconnect() {
-      this.wallet_addresses = []
-      this.wallet_address = ''
       const connector = new WalletConnect({
         bridge: this.bridge,
         qrcodeModal: QRCodeModal,
       })
-      if (connector.connected) {
-        connector.killSession()
-      }
+      if (!connector.connected) return
+      this.wallet_addresses = []
+      this.wallet_address = ''
+      connector.killSession()
       this.connector = null
       localStorage.removeItem('walletconnect')
       // this.$web3.eth.clearSubscriptions()
     },
 
     getMessage() {
+      // not working
       const connector = new WalletConnect({
         bridge: this.bridge,
         qrcodeModal: QRCodeModal,

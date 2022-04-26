@@ -215,7 +215,6 @@ export default {
       connector.killSession()
       this.connector = null
       localStorage.removeItem('walletconnect')
-      // this.$web3.eth.clearSubscriptions()
     },
 
     getMessage() {

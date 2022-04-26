@@ -78,4 +78,11 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+  watchers: {
+    webpack: {
+      ignored: /node_modules/,
+      aggregateTimeout: 300,
+      poll: 1000
+    }
+  }
 }

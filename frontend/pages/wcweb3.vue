@@ -22,12 +22,15 @@
         </v-list-item-content>
       </v-list-item>
       <v-card-actions>
-        <v-btn class="primary" :disabled="!wallet_address" @click="disconnect"
+        <v-btn
+          class="primary"
+          :disabled="!wallet_address"
+          @click="disconnectProvider"
           >Disconnect</v-btn
         >
         <v-spacer></v-spacer>
-        <v-btn class="primary" :disabled="!!wallet_address" @click="connect"
-          >Connect Walletconnect (StandAlone)
+        <v-btn class="primary" :disabled="!!wallet_address" @click="connectweb3"
+          >Connect Walletconnect (Provider)
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -66,9 +69,16 @@
 </template>
 
 <script>
-import WalletConnect from '@walletconnect/client'
-import QRCodeModal from '@walletconnect/qrcode-modal'
-
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import Web3 from 'web3'
+//  Create WalletConnect Provider
+const provider = new WalletConnectProvider({
+  rpc: {
+    4: 'https://rinkeby.arbitrum.io/rpc/',
+  },
+})
+//  Create Web3 instance
+const web3 = new Web3(provider)
 export default {
   data: () => ({
     ethereumSupported: false,
@@ -140,118 +150,85 @@ export default {
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
         this.connector = walletconnect
-        const connector = new WalletConnect({
-          bridge: this.bridge,
-          qrcodeModal: QRCodeModal,
-        })
-        this.subscribeToEvents(connector)
-        // console.log(walletconnect)
+        this.subscribeToEventsProvider(provider)
       } else {
-        console.log('not connected')
+        console.log('⚡', 'Not connected')
       }
     },
-    async connect() {
-      // create new connector
-      const connector = new WalletConnect({
-        bridge: this.bridge,
-        qrcodeModal: QRCodeModal,
-      })
-      // check if already connected
-      if (!connector.connected) {
-        // create new session
-        this.connector = await connector.createSession()
-        this.subscribeToEvents(connector)
+
+    async connectweb3() {
+      //  Create WalletConnect Provider
+      // const provider = new WalletConnectProvider({
+      //   rpc: {
+      //     4: 'https://rinkeby.arbitrum.io/rpc/',
+      //     // ...
+      //   },
+      // })
+      try {
+        //  Enable session (triggers QR Code modal)
+        await provider.enable()
+        this.subscribeToEventsProvider(provider)
+
+        //  Get Accounts
+        const accounts = await web3.eth.getAccounts()
+        this.wallet_addresses = accounts
+        this.wallet_address = accounts[0]
+
+        // //  Get Chain Id
+        const chainId = await web3.eth.getChainId()
+        this.chainId = chainId
+        console.log('⚡', chainId)
+
+        // //  Get Network Id
+        const networkId = await web3.eth.net.getId()
+        this.network_id = networkId
+        console.log('⚡', networkId)
+
+        // Contract not working
+        // const contract = new web3.eth.Contract(
+        //   this.$store.getters['contract/HelloDApp_abi'],
+        //   this.$store.getters['contract/HelloDApp_contract']
+        // )
+
+        // contract.methods
+        //   .readMessage()
+        //   .call()
+        //   .then(console.log)
+        //   .catch(console.error())
+      } catch (error) {
+        console.error(error)
       }
     },
-    subscribeToEvents(connector) {
-      connector.on('session_update', (error, payload) => {
-        if (error) {
-          throw error
-        }
-        // Get updated accounts and chainId
-        const { accounts, chainId } = payload.params[0]
-        this.chainId = chainId
+    subscribeToEventsProvider(provider) {
+      // Subscribe to accounts change
+      provider.on('accountsChanged', (accounts) => {
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
-        console.log('session_update')
+        console.log('⚡', 'accountsChanged')
       })
-      connector.on('connect', (error, payload) => {
-        if (error) {
-          throw error
-        }
-
-        // Get provided accounts and chainId
-        const { accounts, chainId } = payload.params[0]
-        this.chainId = chainId
-        this.wallet_addresses = accounts
-        this.wallet_address = accounts[0]
-        console.log('connect')
-      })
-      connector.on('disconnect', (error, payload) => {
-        if (error) {
-          throw error
-        }
-
+      provider.on('disconnect', (code, reason) => {
+        console.log(code, reason)
+        this.wallet_addresses = []
+        this.wallet_address = ''
         // Delete connector from localstorage and update wallet_address
-        this.disconnect()
-        console.log('disconnect')
+        console.log('⚡', 'disconnect')
       })
     },
-
-    disconnect() {
+    async disconnectProvider() {
       this.wallet_addresses = []
       this.wallet_address = ''
-      const connector = new WalletConnect({
-        bridge: this.bridge,
-        qrcodeModal: QRCodeModal,
-      })
-      if (connector.connected) {
-        connector.killSession()
-      }
-      this.connector = null
+      try {
+        await provider.disconnect()
+      } catch (error) {}
+
       localStorage.removeItem('walletconnect')
-      // this.$web3.eth.clearSubscriptions()
     },
 
     getMessage() {
-      const connector = new WalletConnect({
-        bridge: this.bridge,
-        qrcodeModal: QRCodeModal,
-      })
-      if (!connector.connected) return
-      // Draft Custom Request
-      const customRequest = {
-        id: 1337,
-        jsonrpc: '2.0',
-        method: 'readMessage',
-        params: [
-          {
-            from: '0x4389d68d757d43e3735A27e58E8b21d754257b19',
-            to: '0x4389d68d757d43e3735A27e58E8b21d754257b19',
-            data: '0x',
-            gasPrice: '0x02540be400',
-            gas: '0x9c40',
-            value: '0x00',
-            nonce: '0x0114',
-          },
-        ],
-      }
-
-      // Send Custom Request
-      connector
-        .sendCustomRequest(customRequest)
-        .then((result) => {
-          // Returns request result
-          console.log(result)
-        })
-        .catch((error) => {
-          // Error returned when rejected
-          console.error(error)
-        })
-      console.log('getMessage')
+      console.log('⚡', 'getMessage')
     },
     updateMessage() {
-      // code
+      console.log('⚡', 'updateMessage')
     },
     validate() {
       this.$refs.form.validate()

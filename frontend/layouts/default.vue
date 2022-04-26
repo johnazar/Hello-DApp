@@ -110,6 +110,11 @@ export default {
           icon: 'mdi-chart-bubble',
           title: 'Walletconnect',
           to: '/walletconnect'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Walletconnect Web3',
+          to: '/wcweb3'
         }
       ],
       miniVariant: false,

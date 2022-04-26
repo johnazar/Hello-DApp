@@ -11,8 +11,8 @@ export default ({ store }, inject) => {
   // Inject the $web3 instance into the context object in Nuxt
   if (!web3) return
   const contract = new web3.eth.Contract(
-    store.state.contract.HelloDApp_abi, // コントラクトのコンパイル後の設定ファイル
-    store.state.contract.HelloDApp_contract // ネットワークIDごとに保存されているコントラクトのアドレスを読み込む
+    store.state.contract.HelloDApp_abi,
+    store.state.contract.HelloDApp_contract
   )
   // Inject the $web3 instance into the context object in Nuxt
   inject('HelloDApp_contract', contract)

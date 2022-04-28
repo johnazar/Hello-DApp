@@ -7,11 +7,9 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: nuxtjs/app
+        image: nuxtjs14/app
         ports:
             - '${SITE_PORT:-3000}:3000'
-        environment:
-            WWWUSER: '${WWWUSER}'
         volumes:
             - '.:/usr/src/nuxt-app'
         networks:

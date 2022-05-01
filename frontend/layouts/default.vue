@@ -115,6 +115,11 @@ export default {
           icon: 'mdi-chart-bubble',
           title: 'Walletconnect Web3',
           to: '/wcweb3'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Web3 Modal',
+          to: '/w3modal'
         }
       ],
       miniVariant: false,

@@ -22,9 +22,14 @@
         </v-list-item-content>
       </v-list-item>
       <v-card-actions>
-        <v-btn class="primary" :disabled="!wallet_address">Disconnect</v-btn>
+        <v-btn class="primary" :disabled="!wallet_address" @click="disconnect"
+          >Disconnect</v-btn
+        >
         <v-spacer></v-spacer>
-        <v-btn class="primary" :disabled="!!wallet_address" @click="initModal"
+        <v-btn
+          class="primary"
+          :disabled="!!wallet_address"
+          @click="connectWebModal()"
           >Connect Web3 Modal
         </v-btn>
       </v-card-actions>
@@ -70,6 +75,9 @@ export default {
   data: () => ({
     // modal
     web3ModalInstance: null,
+    web3Instance: null,
+    providerInstance: null,
+    currProviderInstance: '',
     providerOptions: {
       walletconnect: {
         package: WalletConnectProvider,
@@ -147,10 +155,12 @@ export default {
       },
     },
   },
-  mounted() {},
+  mounted() {
+    this.loadConnection()
+  },
   methods: {
     // Web3 Modal init
-    async initModal() {
+    initModal() {
       if (this.web3ModalInstance == null) {
         this.web3ModalInstance = new Web3Modal({
           network: 'rinkeby',
@@ -160,13 +170,75 @@ export default {
           providerOptions: this.providerOptions,
         })
       }
+    },
+    initWeb3(provider) {
+      const web3 = new Web3(provider)
+      return web3
+    },
+    async loadConnection() {
+      const cachedProviderName = JSON.parse(
+        localStorage.getItem('WEB3_CONNECT_CACHED_PROVIDER')
+      )
+      // walletconnect
+      if (cachedProviderName === 'walletconnect') {
+        const walletconnect = JSON.parse(localStorage.getItem('walletconnect'))
+        console.log(walletconnect)
+        if (walletconnect.connected) {
+          await this.connectWebModal('walletconnect')
+        }
+      }
+      // desktop metamask
+      if (cachedProviderName === 'injected') {
+        console.log(cachedProviderName)
+        if (this.wallet_address === '') {
+          await this.connectWebModal()
+        }
+      }
+    },
+    async connectWebModal(usingProvider) {
+      this.initModal()
       try {
-        const provider = await this.web3ModalInstance.connect()
-        const web3 = new Web3(provider)
-        console.log(web3)
+        // let provider = null
+        if (usingProvider) {
+          this.providerInstance = await this.web3ModalInstance.connectTo(
+            usingProvider
+          )
+          this.currProviderInstance = 'walletconnect'
+        } else {
+          this.providerInstance = await this.web3ModalInstance.connect()
+          this.currProviderInstance = 'isMetaMask'
+        }
+        console.log(typeof this.providerInstance)
+
+        this.web3Instance = this.initWeb3(this.providerInstance)
+        // getAccounts works for metamask & wallet connect
+        const accounts = await this.web3Instance.eth.getAccounts()
+        console.log('getAccounts', accounts)
+        this.wallet_addresses = accounts
+        this.wallet_address = accounts[0]
       } catch (error) {
         console.log(error)
       }
+    },
+
+    async disconnect() {
+      try {
+        await this.web3ModalInstance.clearCachedProvider()
+        // currectly disconnect wallet connect
+        if (this.currProviderInstance === 'walletconnect') {
+          await this.providerInstance.disconnect()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      // return var to init state
+      this.wallet_addresses = []
+      this.wallet_address = ''
+      this.currProviderInstance = ''
+      this.web3ModalInstance = null
+      this.providerInstance = null
+      this.web3Instance = null
+      localStorage.removeItem('walletconnect')
     },
   },
 }

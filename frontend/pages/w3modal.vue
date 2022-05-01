@@ -77,7 +77,6 @@ export default {
     web3ModalInstance: null,
     web3Instance: null,
     providerInstance: null,
-    currProviderInstance: '',
     providerOptions: {
       walletconnect: {
         package: WalletConnectProvider,
@@ -156,12 +155,13 @@ export default {
     },
   },
   mounted() {
-    this.loadConnection()
+    // this.loadConnection()
+    this.loadCachedConnection()
   },
   methods: {
     // Web3 Modal init
     initModal() {
-      if (this.web3ModalInstance == null) {
+      if (!this.web3ModalInstance) {
         this.web3ModalInstance = new Web3Modal({
           network: 'rinkeby',
           theme: 'dark',
@@ -171,49 +171,42 @@ export default {
         })
       }
     },
+    async loadCachedConnection() {
+      this.initModal()
+      if (this.web3ModalInstance.cachedProvider) {
+        try {
+          if (this.web3ModalInstance.cachedProvider === 'walletconnect') {
+            await this.connectWebModal('walletconnect')
+          } else {
+            await this.connectWebModal()
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    },
     initWeb3(provider) {
       const web3 = new Web3(provider)
       return web3
     },
-    async loadConnection() {
-      const cachedProviderName = JSON.parse(
-        localStorage.getItem('WEB3_CONNECT_CACHED_PROVIDER')
-      )
-      // walletconnect
-      if (cachedProviderName === 'walletconnect') {
-        const walletconnect = JSON.parse(localStorage.getItem('walletconnect'))
-        console.log(walletconnect)
-        if (walletconnect.connected) {
-          await this.connectWebModal('walletconnect')
-        }
-      }
-      // desktop metamask
-      if (cachedProviderName === 'injected') {
-        console.log(cachedProviderName)
-        if (this.wallet_address === '') {
-          await this.connectWebModal()
-        }
-      }
-    },
+
     async connectWebModal(usingProvider) {
       this.initModal()
       try {
-        // let provider = null
         if (usingProvider) {
           this.providerInstance = await this.web3ModalInstance.connectTo(
             usingProvider
           )
-          this.currProviderInstance = 'walletconnect'
         } else {
           this.providerInstance = await this.web3ModalInstance.connect()
-          this.currProviderInstance = 'isMetaMask'
         }
-        console.log(typeof this.providerInstance)
+        // Subscribe to provider events
+        this.SubscribeProvider(this.providerInstance)
 
         this.web3Instance = this.initWeb3(this.providerInstance)
         // getAccounts works for metamask & wallet connect
         const accounts = await this.web3Instance.eth.getAccounts()
-        console.log('getAccounts', accounts)
+        // console.log('getAccounts', accounts)
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
       } catch (error) {
@@ -222,23 +215,79 @@ export default {
     },
 
     async disconnect() {
+      // test if wallet is connected
+      // this.initModal()
+      if (!this.web3ModalInstance) return
+      console.log(this.web3ModalInstance.cachedProvider)
       try {
-        await this.web3ModalInstance.clearCachedProvider()
         // currectly disconnect wallet connect
-        if (this.currProviderInstance === 'walletconnect') {
+        if (this.web3ModalInstance.cachedProvider === 'walletconnect') {
           await this.providerInstance.disconnect()
         }
+        await this.web3ModalInstance.clearCachedProvider()
       } catch (error) {
         console.log(error)
       }
       // return var to init state
       this.wallet_addresses = []
       this.wallet_address = ''
-      this.currProviderInstance = ''
       this.web3ModalInstance = null
       this.providerInstance = null
       this.web3Instance = null
       localStorage.removeItem('walletconnect')
+    },
+    SubscribeProvider(provider) {
+      provider.on('accountsChanged', (accounts) => {
+        // console.log('accountsChanged:', accounts)
+        if (accounts.length > 0) {
+          this.wallet_address = accounts[0]
+        } else {
+          this.wallet_address = ''
+        }
+        this.wallet_addresses = accounts
+      })
+      // Subscribe to chainId change
+      provider.on('chainChanged', (chainId) => {
+        // console.log('chainChanged: ', chainId)
+      })
+
+      // Subscribe to provider connection
+      provider.on('connect', (info) => {
+        console.log('connect: ', info)
+      })
+      // Subscribe to session disconnection
+      provider.on('disconnect', (code, reason) => {
+        // console.log('disconnect')
+        // console.log(code, reason)
+
+        this.disconnect().then().catch(console.error)
+      })
+    },
+
+    async loadConnection() {
+      const cachedProviderName = JSON.parse(
+        localStorage.getItem('WEB3_CONNECT_CACHED_PROVIDER')
+      )
+      console.log(cachedProviderName)
+      // walletconnect
+      if (cachedProviderName === 'walletconnect') {
+        const walletconnect = JSON.parse(localStorage.getItem('walletconnect'))
+        console.log(walletconnect)
+        if (walletconnect.connected) {
+          await this.connectWebModal('walletconnect')
+        } else {
+          localStorage.removeItem('walletconnect')
+        }
+
+        // desktop metamask
+      } else if (cachedProviderName === 'injected') {
+        if (this.wallet_address === '') {
+          await this.connectWebModal()
+        }
+      } else {
+        // set to null so we can initialize
+        this.web3ModalInstance = null
+      }
     },
   },
 }

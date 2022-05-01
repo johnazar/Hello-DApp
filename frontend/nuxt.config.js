@@ -8,6 +8,8 @@ export default {
   },
   env: {
     projectName: process.env.PROJECT_NAME || '',
+    infuraId: process.env.INFURA_ID || '',
+    contractAddress: process.env.CONTRACT_ADDRESS || '',
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {

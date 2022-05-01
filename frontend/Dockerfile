@@ -4,6 +4,7 @@ FROM node:14.16.0-alpine3.13
 RUN mkdir -p /usr/src/nuxt-app
 WORKDIR /usr/src/nuxt-app
 
+RUN apk add --update --no-cache python2 make gcc libsass g++
 # update and install dependency
 RUN apk update && apk upgrade
 RUN apk add git

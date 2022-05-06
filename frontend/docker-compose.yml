@@ -1,13 +1,13 @@
 # For more information: https://laravel.com/docs/sail
 version: '3'
 services:
-    frontend:
+    dapp:
         stdin_open:
             true
         build:
             context: .
             dockerfile: Dockerfile
-        image: nuxtjs14/app
+        image: nuxtjs14/hello-dapp
         ports:
             - '${SITE_PORT:-3000}:3000'
         volumes:

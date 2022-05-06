@@ -5,6 +5,7 @@ RUN mkdir -p /usr/src/nuxt-app
 WORKDIR /usr/src/nuxt-app
 
 RUN apk add --update --no-cache python2 make gcc libsass g++
+RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 # update and install dependency
 RUN apk update && apk upgrade
 RUN apk add git

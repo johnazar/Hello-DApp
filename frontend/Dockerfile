@@ -8,7 +8,7 @@ RUN apk add --update --no-cache python2 make gcc libsass g++
 # update and install dependency
 RUN apk update && apk upgrade
 RUN apk add git
-RUN npm install -g npm@8.1.2
+RUN npm install -g npm@8.9.0
 
 EXPOSE 3000
 

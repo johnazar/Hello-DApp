@@ -22,7 +22,10 @@
         </v-list-item-content>
       </v-list-item>
       <v-card-actions>
-        <v-btn class="primary" :disabled="!wallet_address" @click="disconnectWebModal()"
+        <v-btn
+          class="primary"
+          :disabled="!wallet_address"
+          @click="disconnectWebModal()"
           >Disconnect</v-btn
         >
         <v-spacer></v-spacer>
@@ -39,7 +42,8 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="mb-1">
-            Current message: <v-icon>mdi-refresh</v-icon>
+            Current message:
+            <v-icon @click="refreshMessage">mdi-refresh</v-icon>
           </v-list-item-title>
           <v-list-item-subtitle>{{ message }}</v-list-item-subtitle>
           <v-list-item-title class="mt-4 mb-1">
@@ -67,8 +71,6 @@
 </template>
 
 <script>
-
-
 export default {
   layout: 'universal',
   data: () => ({
@@ -133,6 +135,15 @@ export default {
     // this.loadConnection()
     // this.loadCachedConnection()
   },
-  methods: {},
+  methods: {
+    refreshMessage() {
+      console.log('⚡', 'refreshMessage')
+      this.$DAppContract.methods
+        .readMessage()
+        .call()
+        .then(console.log)
+        .catch(console.error())
+    },
+  },
 }
 </script>

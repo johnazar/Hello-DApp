@@ -8,8 +8,8 @@ export default {
   },
   env: {
     projectName: process.env.PROJECT_NAME || '',
-    infuraId: process.env.INFURA_ID || '',
     contractAddress: process.env.CONTRACT_ADDRESS || '',
+    infuraIdDapp: process.env.INFURA_ID_DAPP || '',
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -34,6 +34,7 @@ export default {
   plugins: [
     '~/plugins/filters.js',
     '~/plugins/web3',
+    '~/plugins/contract',
     '~/plugins/mixins.js',
   ],
 
@@ -84,7 +85,7 @@ export default {
     webpack: {
       ignored: /node_modules/,
       aggregateTimeout: 300,
-      poll: 1000
-    }
-  }
+      poll: 1000,
+    },
+  },
 }

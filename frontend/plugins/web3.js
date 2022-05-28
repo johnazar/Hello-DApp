@@ -2,6 +2,7 @@ import Web3 from 'web3'
 
 export default ({ store }, inject) => {
   let web3 = null
+
   if (!process.client) return // don't run on serverside
   web3 =
     window.ethereum && window.ethereum.isMetaMask

@@ -25,7 +25,7 @@
         <v-btn
           class="primary"
           :disabled="!wallet_address"
-          @click="disconnectWebModal()"
+          @click="$nuxt.$emit('disconnectWebModalEvent')"
           >Disconnect</v-btn
         >
         <v-spacer></v-spacer>
@@ -132,8 +132,6 @@ export default {
     },
   },
   mounted() {
-    // this.loadConnection()
-    // this.loadCachedConnection()
     this.refreshMessage()
   },
   methods: {

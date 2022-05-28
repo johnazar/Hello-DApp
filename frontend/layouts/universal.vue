@@ -107,6 +107,12 @@ export default {
       title: process.env.projectName,
     }
   },
+  created() {
+    this.$nuxt.$on('disconnectWebModalEvent', () => this.disconnectWebModal())
+  },
+  beforeDestroy() {
+    this.$nuxt.$off('disconnectWebModalEvent')
+  },
   mounted() {
     // this.loadConnection()
     this.loadCachedConnection()

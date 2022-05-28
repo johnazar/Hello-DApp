@@ -89,9 +89,13 @@ export default {
   },
   created() {
     this.$nuxt.$on('disconnectWebModalEvent', () => this.disconnectWebModal())
+    this.$nuxt.$on('connectWebModal', () => this.connectWebModal())
+    this.$nuxt.$on('updateMessage', (payload) => this.updateMessage(payload))
   },
   beforeDestroy() {
     this.$nuxt.$off('disconnectWebModalEvent')
+    this.$nuxt.$off('connectWebModal')
+    this.$nuxt.$off('updateMessage')
   },
   mounted() {
     // this.loadConnection()

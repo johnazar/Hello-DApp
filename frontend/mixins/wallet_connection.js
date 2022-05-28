@@ -106,6 +106,7 @@ export default {
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
         console.log('⚡', 'Create contract')
+        
         // Create contract instance to write to contract
         this.contractInstance = new this.web3Instance.eth.Contract(
           this.$store.state.contract.HelloDApp_abi,

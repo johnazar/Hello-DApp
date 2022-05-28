@@ -32,7 +32,7 @@
         <v-btn
           class="primary"
           :disabled="!!wallet_address"
-          @click="connectWebModal()"
+          @click="$nuxt.$emit('connectWebModal')"
           >Connect Web3 Modal
         </v-btn>
       </v-card-actions>
@@ -64,7 +64,13 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <!-- <v-btn class="primary" @click="validate"> Validate</v-btn> -->
-        <v-btn class="primary" @click="updateMessage(newMessage)"> Update message</v-btn>
+        <v-btn
+          class="primary"
+          :disabled="!allowUpdate"
+          @click="$nuxt.$emit('updateMessage', newMessage)"
+        >
+          Update message</v-btn
+        >
       </v-card-actions>
     </v-card>
   </div>
@@ -77,7 +83,7 @@ export default {
     ethereumSupported: false,
     formValid: false,
     message: '',
-    newMessage: 'Test',
+    newMessage: '',
     messageRules: [
       (v) => !!v || 'Message is required',
       (v) => (v && v.length <= 25) || 'Message must be less than 10 characters',

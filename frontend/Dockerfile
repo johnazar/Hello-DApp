@@ -1,5 +1,5 @@
 # Dockerfile
-FROM node:14.16.0-alpine3.13
+FROM --platform=linux/amd64 node:14.16.0-alpine3.13
 # create destination directory
 RUN mkdir -p /usr/src/nuxt-app
 WORKDIR /usr/src/nuxt-app

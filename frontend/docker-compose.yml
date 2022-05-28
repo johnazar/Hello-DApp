@@ -8,6 +8,7 @@ services:
             context: .
             dockerfile: Dockerfile
         image: nuxtjs14/hello-dapp
+        container_name: DApp
         ports:
             - '${SITE_PORT:-3000}:3000'
         volumes:

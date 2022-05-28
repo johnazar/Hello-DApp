@@ -10,7 +10,7 @@
           </p>
 
           <p>
-            Do not hesitate to try it out, source code at 
+            Do not hesitate to try it out, source code at
             <a
               href="https://github.com/johnazar/Hello-DApp"
               target="_blank"
@@ -66,9 +66,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="primary" nuxt to="/hellodapp"> Continue </v-btn>
+          <v-btn color="primary" nuxt to="/unimodal"> Continue </v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
 </template>
+<script>
+export default {
+  layout: 'universal',
+}
+</script>

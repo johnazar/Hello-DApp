@@ -77,26 +77,6 @@ export default {
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'MetaMask',
-          to: '/hellodapp',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Walletconnect',
-          to: '/walletconnect',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Walletconnect Web3',
-          to: '/wcweb3',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Web3 Modal',
-          to: '/w3modal',
-        },
-        {
-          icon: 'mdi-chart-bubble',
           title: 'Uni web3 Modal',
           to: '/unimodal',
         },

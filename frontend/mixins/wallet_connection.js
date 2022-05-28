@@ -27,6 +27,7 @@ export default {
         },
       },
     },
+    contractInstance: null,
     // Web3 Modal
   }),
   computed: {
@@ -99,10 +100,18 @@ export default {
 
         this.web3Instance = this.initWeb3(this.providerInstance)
         const accounts = await this.web3Instance.eth.getAccounts()
+
         // const accounts = await this.web3Instance.eth.requestAccounts() // correct approach
         // console.log('getAccounts', accounts)
         this.wallet_addresses = accounts
         this.wallet_address = accounts[0]
+        console.log('⚡', 'Create contract')
+        // Create contract instance to write to contract
+        this.contractInstance = new this.web3Instance.eth.Contract(
+          this.$store.state.contract.HelloDApp_abi,
+          this.$store.state.contract.HelloDApp_contract
+        )
+        console.log('⚡', 'Contract Created', this.contractInstance)
       } catch (error) {
         console.log(error)
       }
@@ -134,6 +143,7 @@ export default {
       this.web3ModalInstance = null
       this.providerInstance = null
       this.web3Instance = null
+      this.contractInstance = null
       localStorage.removeItem('walletconnect')
     },
     SubscribeProvider(provider) {
@@ -161,6 +171,24 @@ export default {
       provider.on('disconnect', (code, reason) => {
         this.disconnectWebModal().then().catch(console.error)
       })
+    },
+    refreshMessage() {
+      console.log('⚡', 'refreshMessage')
+      this.$DAppContract.methods
+        .readMessage()
+        .call()
+        .then((v) => (this.message = v))
+        .catch(console.error())
+    },
+    updateMessage(msg) {
+      console.log('⚡', 'updateMessage', msg, this.wallet_address)
+      console.log('⚡', 'Contract Created', this.contractInstance)
+      if (!this.contractInstance) return
+      this.contractInstance.methods
+        .updateMessage(msg)
+        .send({ from: this.wallet_address })
+        .then(console.log)
+        .catch(console.error)
     },
   },
 }

@@ -64,7 +64,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <!-- <v-btn class="primary" @click="validate"> Validate</v-btn> -->
-        <v-btn class="primary" :disabled="!allowUpdate"> Update message</v-btn>
+        <v-btn class="primary" @click="updateMessage(newMessage)"> Update message</v-btn>
       </v-card-actions>
     </v-card>
   </div>
@@ -77,7 +77,7 @@ export default {
     ethereumSupported: false,
     formValid: false,
     message: '',
-    newMessage: '',
+    newMessage: 'Test',
     messageRules: [
       (v) => !!v || 'Message is required',
       (v) => (v && v.length <= 25) || 'Message must be less than 10 characters',
@@ -132,17 +132,9 @@ export default {
     },
   },
   mounted() {
+    // Called on wallet_conntion js
     this.refreshMessage()
   },
-  methods: {
-    refreshMessage() {
-      console.log('⚡', 'refreshMessage')
-      this.$DAppContract.methods
-        .readMessage()
-        .call()
-        .then((v) => (this.message = v))
-        .catch(console.error())
-    },
-  },
+  methods: {},
 }
 </script>

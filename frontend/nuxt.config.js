@@ -10,7 +10,7 @@ export default {
     projectName: process.env.PROJECT_NAME || '',
     contractAddress: process.env.CONTRACT_ADDRESS || '',
     infuraIdDapp: process.env.INFURA_ID_DAPP || '',
-    infuraIdToken: process.env.INFURA_ID_TOKEN || '',
+    infuraProjectId: process.env.INFURA_PROJECT_ID || '',
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {

@@ -134,6 +134,7 @@ export default {
   mounted() {
     // this.loadConnection()
     // this.loadCachedConnection()
+    this.refreshMessage()
   },
   methods: {
     refreshMessage() {
@@ -141,7 +142,7 @@ export default {
       this.$DAppContract.methods
         .readMessage()
         .call()
-        .then(console.log)
+        .then((v) => (this.message = v))
         .catch(console.error())
     },
   },

@@ -12,7 +12,7 @@ export default {
       walletconnect: {
         package: WalletConnectProvider,
         options: {
-          infuraId: process.env.infuraIdToken,
+          infuraId: process.env.infuraProjectId,
           // qrcode: false,
           // qrcodeModalOptions: {
           //     mobileLinks: [
